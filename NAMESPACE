@@ -2,5 +2,5 @@
 
 export(send.mail)
 import(R.utils)
-import(rJava)
+import(rscala)
 import(stringr)

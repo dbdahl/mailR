@@ -5,6 +5,11 @@ Overview
 ========
 mailR allows users to send emails from R.
 
+**This is a fork of Rahul Premraj's [mailR](https://cran.r-project.org/package=mailR)
+that demonstrates replacing a dependency on [rJava](https://cran.r-project.org/package=rJava)
+with a dependency on [rScala](https://cran.r-project.org/package=rscala).  The fork
+took place on 2017-05-12 based on commit 4c119d0 from <https://github.com/rpremraj/mailR>.**
+
 It is developed as a wrapper around [Apache Commons Email](http://commons.apache.org/proper/commons-email/) and offers several features to send emails from R such as:
 - using authentication-based SMTP servers
 - sending emails to multiple recipients (including the use of Cc, Bcc, and ReplyTo recipients)

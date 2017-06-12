@@ -28,9 +28,9 @@
 
   for(i in 1:length(attach.files))
   {
-    attachments[[i]] <- .jnew("org.apache.commons.mail.EmailAttachment")
+    attachments[[i]] <- s$.org.apache.commons.mail.EmailAttachment$new()
     if(isUrl(attach.files[i]))
-      attachments[[i]]$setURL(.jnew("java.net.URL", attach.files[i]))
+      attachments[[i]]$setURL(s$.java.net.URL$new(attach.files[i]))
     else
     {
       if(file.exists(attach.files[i]))
@@ -53,8 +53,8 @@
 #' @details This is an internal function that performs the groundwork to embed images as inline.
 .resolveInlineImages <- function(image.file.locations)
 {
-  base_dir <- .jnew("java.io.File", normalizePath(getwd()))
-  file.resolver <- .jnew("org.apache.commons.mail.resolver.DataSourceFileResolver", base_dir)
+  base_dir <- s$.java.io.File$new(normalizePath(getwd()))
+  file.resolver <- s$.org.apache.commons.mail.resolver.DataSourceFileResolver$new(base_dir)
   sapply(image.file.locations, file.resolver$resolve)
 
   return(file.resolver)
@@ -69,7 +69,7 @@
   if(!all(c("user.name", "passwd") %in% names(smtp)))
     stop("Username and password required for SMTP authentication.")
 
-  smtp.authentication <- .jnew("org.apache.commons.mail.DefaultAuthenticator", smtp$user.name, smtp$passwd)
+  smtp.authentication <- s$.org.apache.commons.mail.DefaultAuthenticator$new(smtp$user.name, smtp$passwd)
 
   return(smtp.authentication)
 }
@@ -155,13 +155,13 @@ send.mail <- function(from, to, subject = "", body = "", encoding = "iso-8859-1"
   dots <- list(...)
 
   if(html && inline)
-    email <- .jnew("org.apache.commons.mail.ImageHtmlEmail")
+    email <- s$.org.apache.commons.mail.ImageHtmlEmail$new()
   else if(html)
-    email <- .jnew("org.apache.commons.mail.HtmlEmail")
+    email <- s$.org.apache.commons.mail.HtmlEmail$new()
   else if(!is.null(attach.files))
-    email <- .jnew("org.apache.commons.mail.MultiPartEmail")
+    email <- s$.org.apache.commons.mail.MultiPartEmail$new()
   else
-    email <- .jnew("org.apache.commons.mail.SimpleEmail")
+    email <- s$.org.apache.commons.mail.SimpleEmail$new()
 
   if(debug)
     email$setDebug(TRUE)
@@ -174,7 +174,7 @@ send.mail <- function(from, to, subject = "", body = "", encoding = "iso-8859-1"
     sapply(attachments, email$attach)
   }
 
-  if(.jclass(email) == "org.apache.commons.mail.ImageHtmlEmail")
+  if(email[['type']] == "org.apache.commons.mail.ImageHtmlEmail")
   {
     image.files.references <- str_extract_all(body, email$REGEX_IMG_SRC)
     pattern <- "\"([^\"]*)\""
@@ -245,7 +245,7 @@ send.mail <- function(from, to, subject = "", body = "", encoding = "iso-8859-1"
   }
 
   if(send)
-    .jTryCatch(email$send())
+    email$send()
 
   return(email)
 }
@@ -261,23 +261,8 @@ send.mail <- function(from, to, subject = "", body = "", encoding = "iso-8859-1"
 {
   for(i in emails)
   {
-    .jTryCatch(.jnew("javax.mail.internet.InternetAddress", i))
+    s$.javax.mail.internet.InternetAddress$new(i)
   }
   gc()
   return(TRUE)
-}
-
-#' Internal function to catch Java exceptions and print stack traces. Inspired by author of package XLConnect.
-#' @param ... A call to a Java method
-.jTryCatch <- function(...) {
-  tryCatch(..., Throwable =
-             function(e) {
-               if(!is.jnull(e$jobj)) {
-                 print(e$jobj$printStackTrace())
-                 stop(paste(class(e)[1], e$jobj$getMessage(), sep = " (Java): "), call. = FALSE)
-               } else
-                 stop("Undefined error occurred! Turn debug mode on to see more details.")
-             },
-             error = function(e) message(e)
-  )
 }
