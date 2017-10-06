@@ -2,6 +2,3 @@
   .rscalaPackage(pkgname)
 }
 
-.onUnload <- function(libpath) {
-  .rscalaPackageUnload()
-}
